@@ -1,0 +1,658 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.container {
+    max-width: 90vw;
+    margin: 0 auto;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+h1 {
+    text-align: center;
+    padding: 25px 30px 15px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-size: 2.5rem;
+    font-weight: 300;
+    margin-bottom: 0;
+}
+
+/* 단축키 안내 스타일 */
+.shortcuts-info {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 0 30px 20px;
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+    flex-wrap: wrap;
+}
+
+.shortcuts-info span {
+    color: white;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.shortcuts-info kbd {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* 탭 버튼 스타일 */
+.tab-buttons {
+    display: flex;
+    background: #f8f9fa;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.tab-button {
+    flex: 1;
+    padding: 15px 20px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #6c757d;
+    transition: all 0.3s ease;
+    border-bottom: 3px solid transparent;
+    position: relative;
+}
+
+.tab-button.dragging {
+    opacity: 0.5;
+    transform: scale(0.95);
+    z-index: 1000;
+}
+
+.tab-button.drag-over-left {
+    border-left: 3px solid #667eea;
+}
+
+.tab-button.drag-over-right {
+    border-right: 3px solid #667eea;
+}
+
+.tab-button:hover {
+    background: #e9ecef;
+    color: #495057;
+}
+
+.tab-button.active {
+    background: white;
+    color: #667eea;
+    border-bottom-color: #667eea;
+}
+
+.add-tab-btn {
+    padding: 15px 20px;
+    border: none;
+    background: #28a745;
+    color: white;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border-bottom: 3px solid transparent;
+}
+
+.add-tab-btn:hover {
+    background: #218838;
+}
+
+.delete-tab-btn {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    margin-left: 10px;
+    transition: all 0.3s ease;
+}
+
+.delete-tab-btn:hover {
+    background: #c82333;
+    transform: scale(1.05);
+}
+
+/* 탭 내용 스타일 */
+.tab-content {
+    display: none;
+    padding: 20px;
+    min-height: 500px;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.tab-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 20px;
+}
+
+.tab-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.tab-name-input {
+    font-size: 1.5rem;
+    font-weight: 600;
+    border: none;
+    background: transparent;
+    color: #333;
+    padding: 10px;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s ease;
+    min-width: 200px;
+}
+
+.tab-name-input:focus {
+    outline: none;
+    border-bottom-color: #667eea;
+    background: #f8f9fa;
+    border-radius: 5px 5px 0 0;
+}
+
+.add-task-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.add-task-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+/* 엑셀과 같은 테이블 스타일 */
+.table-container {
+    overflow-x: auto;
+    border-radius: 6px;
+}
+
+.excel-table {
+    width: 100%;
+    min-width: 800px;
+    table-layout: fixed;
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 2px solid #d4d4d4;
+    border-radius: 6px;
+    overflow: hidden;
+    background: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.excel-table thead {
+    background: #f2f2f2;
+    border-bottom: 2px solid #d4d4d4;
+}
+
+.excel-table th {
+    padding: 12px 8px;
+    text-align: left;
+    font-weight: 600;
+    color: #333;
+    border-right: 1px solid #d4d4d4;
+    background: #f8f9fa;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    position: relative;
+}
+
+.column-resizer {
+    position: absolute;
+    top: 0;
+    right: -4px;
+    width: 8px;
+    height: 100%;
+    cursor: col-resize;
+    background: transparent;
+    z-index: 11;
+}
+
+.column-resizer:hover {
+    background: rgba(102, 126, 234, 0.2);
+    border-right: 2px solid #667eea;
+}
+
+.column-resizer.resizing {
+    background: rgba(102, 126, 234, 0.3);
+    border-right: 2px solid #667eea;
+}
+
+/* 테이블 전체적으로 컬럼 리사이징 중일 때 */
+.table-resizing {
+    user-select: none;
+    cursor: col-resize !important;
+}
+
+.table-resizing * {
+    cursor: col-resize !important;
+}
+
+/* 전역 컬럼 리사이징 상태 */
+body.col-resizing {
+    cursor: col-resize !important;
+    user-select: none !important;
+}
+
+body.col-resizing * {
+    cursor: col-resize !important;
+}
+
+.excel-table th:first-child {
+    width: 40px;
+    text-align: center;
+    background: #e9ecef;
+}
+
+.excel-table th:nth-child(2) {
+    width: 35%;
+    min-width: 200px;
+}
+
+.excel-table th:nth-child(3),
+.excel-table th:nth-child(4),
+.excel-table th:nth-child(5) {
+    width: 20%;
+    min-width: 150px;
+}
+
+.excel-table th:last-child {
+    width: 50px;
+    border-right: none;
+}
+
+/* 헤더 입력 필드 */
+.header-input {
+    width: 100%;
+    border: none;
+    background: transparent;
+    font-weight: 600;
+    font-size: inherit;
+    color: #333;
+    text-align: left;
+    padding: 4px 8px;
+    outline: none;
+    font-family: inherit;
+}
+
+.header-input:focus {
+    background: rgba(102, 126, 234, 0.1);
+    border-radius: 4px;
+}
+
+/* 헤더 가운데 정렬 */
+.center-header {
+    text-align: center !important;
+}
+
+.center-input {
+    text-align: center !important;
+}
+
+.excel-table tbody tr {
+    transition: background-color 0.2s ease;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.excel-table tbody tr:hover {
+    background: #f8f9ff;
+}
+
+.excel-table tbody tr.dragging {
+    opacity: 0.6;
+    background: #fff3cd;
+}
+
+.excel-table tbody tr.drag-over-top {
+    border-top: 3px solid #667eea;
+}
+
+.excel-table tbody tr.drag-over-bottom {
+    border-bottom: 3px solid #667eea;
+}
+
+/* 드래그 시 삽입 위치 표시 */
+.drag-insert-indicator {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #667eea, #764ba2);
+    z-index: 1000;
+    box-shadow: 0 0 8px rgba(102, 126, 234, 0.5);
+    border-radius: 2px;
+}
+
+.drag-insert-indicator::before {
+    content: '';
+    position: absolute;
+    left: -6px;
+    top: -3px;
+    width: 0;
+    height: 0;
+    border-left: 6px solid #667eea;
+    border-top: 4px solid transparent;
+    border-bottom: 4px solid transparent;
+}
+
+.drag-insert-indicator::after {
+    content: '';
+    position: absolute;
+    right: -6px;
+    top: -3px;
+    width: 0;
+    height: 0;
+    border-right: 6px solid #667eea;
+    border-top: 4px solid transparent;
+    border-bottom: 4px solid transparent;
+}
+
+.excel-table td {
+    padding: 0;
+    border-right: 1px solid #e0e0e0;
+    vertical-align: middle;
+    position: relative;
+}
+
+.excel-table td:last-child {
+    border-right: none;
+}
+
+/* 드래그 핸들 */
+.drag-handle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 40px;
+    cursor: grab;
+    color: #999;
+    font-size: 14px;
+    background: #f8f9fa;
+    border-right: 1px solid #e0e0e0;
+}
+
+.drag-handle:hover {
+    background: #e9ecef;
+    color: #666;
+}
+
+.drag-handle:active {
+    cursor: grabbing;
+}
+
+/* 입력 필드 스타일 (엑셀과 같은) */
+.cell-input {
+    width: 100%;
+    height: 40px;
+    padding: 8px 12px;
+    border: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 14px;
+    resize: none;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.cell-input:focus {
+    background: white;
+    box-shadow: inset 0 0 0 2px #667eea;
+    z-index: 5;
+    position: relative;
+}
+
+.cell-input.title-input {
+    font-weight: 500;
+}
+
+/* 체크박스 셀 */
+.checkbox-cell {
+    text-align: center;
+    padding: 8px;
+}
+
+.task-checkbox {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #667eea;
+}
+
+/* 행 번호 */
+.row-number {
+    text-align: center;
+    font-size: 12px;
+    color: #666;
+    font-weight: 500;
+    background: #f8f9fa;
+    border-right: 1px solid #d4d4d4;
+}
+
+/* 새 행 추가 버튼 */
+.add-row-btn {
+    width: 100%;
+    height: 40px;
+    border: none;
+    background: #f8f9fa;
+    color: #667eea;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    border-top: 1px solid #e0e0e0;
+}
+
+.add-row-btn:hover {
+    background: #e9ecef;
+    color: #5a67d8;
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+    .container {
+        margin: 10px;
+        border-radius: 10px;
+    }
+
+    h1 {
+        font-size: 2rem;
+        padding: 20px;
+    }
+
+    .tab-content {
+        padding: 15px;
+    }
+
+    .excel-table {
+        font-size: 12px;
+    }
+
+    .excel-table th,
+    .cell-input {
+        padding: 6px 8px;
+    }
+
+    .cell-input {
+        height: 35px;
+    }
+
+    .drag-handle {
+        height: 35px;
+    }
+}
+
+/* 스크롤바 스타일 */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Firebase 인증 UI 스타일 */
+.auth-container {
+    text-align: center;
+    padding: 40px 20px;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.login-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+}
+
+.login-section h2 {
+    margin-bottom: 10px;
+    font-size: 1.8rem;
+}
+
+.login-section p {
+    margin-bottom: 30px;
+    opacity: 0.9;
+    font-size: 1.1rem;
+}
+
+.login-btn {
+    background: white;
+    color: #667eea;
+    border: none;
+    padding: 15px 30px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.login-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.offline-mode {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.offline-btn {
+    background: transparent;
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    padding: 10px 20px;
+    font-size: 1rem;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 10px;
+}
+
+.offline-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: white;
+}
+
+.offline-mode small {
+    display: block;
+    opacity: 0.7;
+    font-size: 0.9rem;
+}
+
+.user-section {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+}
+
+.user-photo {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid #667eea;
+}
+
+.user-name {
+    font-weight: 600;
+    color: #333;
+    font-size: 1.1rem;
+}
+
+.logout-btn {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.logout-btn:hover {
+    background: #c82333;
+    transform: translateY(-1px);
+} 

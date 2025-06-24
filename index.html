@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>할일 관리</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 로그인 상태 표시 -->
+        <div id="authContainer" class="auth-container">
+            <div id="loginSection" class="login-section">
+                <h2>🔐 로그인이 필요합니다</h2>
+                <p>Firebase 실시간 동기화를 위해 구글 계정으로 로그인해주세요.</p>
+                <button id="loginBtn" class="login-btn">🚀 구글로 로그인</button>
+                <div class="offline-mode">
+                    <button id="offlineBtn" class="offline-btn">📱 오프라인 모드로 계속</button>
+                    <small>로그인 없이 로컬에서만 사용 (동기화 안됨)</small>
+                </div>
+            </div>
+            <div id="userSection" class="user-section" style="display: none;">
+                <div class="user-info">
+                    <img id="userPhoto" class="user-photo" src="" alt="프로필">
+                    <span id="userName" class="user-name"></span>
+                    <button id="logoutBtn" class="logout-btn">로그아웃</button>
+                            </div>
+        </div>
+        </div>
+    </div>
+
+        <div id="appContainer" style="display: none;">
+            <h1>할일 관리 시스템</h1>
+            
+            <!-- 단축키 안내 -->
+        <div class="shortcuts-info">
+            <span><kbd>Enter</kbd> 다음 행으로</span>
+            <span><kbd>Tab</kbd> 다음 열로</span>
+            <span><kbd>Ctrl + Z</kbd> 실행 취소</span>
+            <span><kbd>Ctrl + 1~9</kbd> 탭 전환</span>
+            <span><kbd>Ctrl + 클릭</kbd> 링크 열기</span>
+        </div>
+        
+        <!-- 탭 메뉴 -->
+        <div class="tab-container">
+            <div class="tab-buttons">
+                <button class="tab-button active" data-tab="0">유튜브 할일</button>
+                <button class="tab-button" data-tab="1">상품등록</button>
+                <button class="tab-button" data-tab="2">상품수정</button>
+                <button class="tab-button" data-tab="3">마케팅</button>
+                <button class="tab-button" data-tab="4">기타</button>
+                <button class="add-tab-btn" onclick="addNewTab()">+ 탭 추가</button>
+            </div>
+            
+            <!-- 탭 내용 -->
+            <div class="tab-contents" id="tabContents">
+                <!-- 탭 내용들이 동적으로 생성됩니다 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+        import { getDatabase, ref, set, get, onValue, off } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-database.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-auth.js";
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyB43HBXrPEL60bXVPNMmYVXKMgVbsU1sas",
+            authDomain: "my-todo-app-ca4b6.firebaseapp.com",
+            databaseURL: "https://my-todo-app-ca4b6-default-rtdb.asia-southeast1.firebasedatabase.app/",
+            projectId: "my-todo-app-ca4b6",
+            storageBucket: "my-todo-app-ca4b6.firebasestorage.app",
+            messagingSenderId: "39331163333",
+            appId: "1:39331163333:web:14b9f62c3ec8f7e287d4ac"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
+
+        // Firebase 객체들을 전역으로 사용할 수 있게 설정
+        window.firebaseApp = app;
+        window.firebaseDB = database;
+        window.firebaseAuth = auth;
+        window.firebaseProvider = provider;
+        window.firebaseRef = ref;
+        window.firebaseSet = set;
+        window.firebaseGet = get;
+        window.firebaseOnValue = onValue;
+        window.firebaseOff = off;
+        window.firebaseSignInWithPopup = signInWithPopup;
+        window.firebaseSignOut = signOut;
+        window.firebaseOnAuthStateChanged = onAuthStateChanged;
+    </script>
+    <script src="script.js"></script>
+</body>
+</html> 
