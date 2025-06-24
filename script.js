@@ -136,15 +136,20 @@ function saveData() {
 
 // 초기화
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 페이지 로드 시작');
+    
+    // 로컬 데이터 먼저 로드 (빠른 초기화)
+    loadData();
+    
     // Firebase 로드 대기
     setTimeout(() => {
         if (window.firebaseAuth) {
             setupFirebaseAuth();
         } else {
-            console.log('Firebase 로드 대기 중...');
+            console.log('⏳ Firebase 로드 대기 중...');
             setTimeout(setupFirebaseAuth, 1000);
         }
-    }, 500);
+    }, 100); // 더 빠른 초기화
 });
 
 function setupFirebaseAuth() {
@@ -227,20 +232,31 @@ function setupFirebaseAuth() {
     });
     
     // 인증 상태 변화 감지 (자동 로그인 포함)
-    window.firebaseOnAuthStateChanged(window.firebaseAuth, (user) => {
-        if (user && !currentUser) {
+    window.firebaseOnAuthStateChanged(window.firebaseAuth, async (user) => {
+        console.log('🔄 인증 상태 변화 감지:', user ? `로그인됨 (${user.email})` : '로그아웃됨');
+        
+        if (user) {
+            // 사용자가 로그인된 상태
             currentUser = user;
             isOnlineMode = true;
             showUserSection();
             showMainApp();
-            loadUserDataFromFirebase();
-            console.log('🔄 자동 로그인 성공:', user.displayName || user.email);
-        } else if (!user) {
+            
+            // Firebase 데이터 로드
+            await loadUserDataFromFirebase();
+            console.log('✅ 자동 로그인 성공:', user.displayName || user.email);
+        } else {
             // 로그아웃 상태
+            if (currentUser) {
+                console.log('🚪 로그아웃 감지');
+            }
             currentUser = null;
             isOnlineMode = false;
             showLoginSection();
             hideMainApp();
+            
+            // 오프라인 모드로 로컬 데이터 로드
+            loadData();
         }
     });
 }
