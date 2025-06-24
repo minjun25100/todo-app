@@ -303,8 +303,8 @@ async function loadUserDataFromFirebase() {
             nextTabId = userData.nextTabId || 1;
             
             // UI 업데이트
-            renderTabs();
-            renderAllTables();
+    renderTabs();
+    renderAllTables();
             setupKeyboardShortcuts(); // 키보드 단축키 설정
             setupColumnResizers(); // 컬럼 리사이저 설정
             
@@ -1198,7 +1198,7 @@ function importData(event) {
         };
         reader.readAsText(file);
     }
-}
+} 
 
 // 컬럼 리사이저 설정 (엑셀/구글시트 스타일)
 function setupColumnResizers() {
