@@ -66,16 +66,21 @@ h1 {
 
 .tab-button {
     flex: 1;
-    padding: 15px 20px;
+    padding: 16px 24px;
     border: none;
-    background: transparent;
+    background: linear-gradient(145deg, #ffffff, #f8f9fa);
     cursor: pointer;
-    font-size: 1rem;
-    font-weight: 500;
-    color: #6c757d;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #495057;
     transition: all 0.3s ease;
     border-bottom: 3px solid transparent;
     position: relative;
+    border-radius: 8px 8px 0 0;
+    margin-right: 2px;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.06);
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9);
+    letter-spacing: 0.3px;
 }
 
 .tab-button.dragging {
@@ -93,14 +98,19 @@ h1 {
 }
 
 .tab-button:hover {
-    background: #e9ecef;
-    color: #495057;
+    background: linear-gradient(145deg, #f1f3f4, #e9ecef);
+    color: #343a40;
+    transform: translateY(-1px);
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .tab-button.active {
-    background: white;
+    background: linear-gradient(145deg, #ffffff, #ffffff);
     color: #667eea;
     border-bottom-color: #667eea;
+    box-shadow: 0 -4px 16px rgba(102, 126, 234, 0.15);
+    transform: translateY(-2px);
+    font-weight: 800;
 }
 
 .add-tab-btn {
@@ -226,13 +236,15 @@ h1 {
     padding: 12px 8px;
     text-align: left;
     font-weight: 600;
-    color: #333;
+    color: #495057;
     border-right: 1px solid #d4d4d4;
-    background: #f8f9fa;
+    background: linear-gradient(180deg, #f8f9fa, #e9ecef);
     position: sticky;
     top: 0;
     z-index: 10;
     position: relative;
+    font-size: 0.95rem;
+    letter-spacing: 0.2px;
 }
 
 .column-resizer {
