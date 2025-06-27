@@ -439,7 +439,7 @@ body.col-resizing * {
     border: none;
     background: transparent;
     font-family: inherit;
-    font-size: 14px;
+    font-size: 12px;
     resize: none;
     outline: none;
     transition: all 0.2s ease;
@@ -487,7 +487,7 @@ body.col-resizing * {
     background: #f8f9fa;
     color: #667eea;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 12px;
     transition: all 0.2s ease;
     border-top: 1px solid #e0e0e0;
 }
