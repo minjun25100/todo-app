@@ -8,6 +8,7 @@ let taskData = {};
 let tabNames = ['유튜브 할일', '상품등록', '상품수정', '마케팅', '기타'];
 let columnNamesByTab = {}; // 탭별로 컬럼 이름 관리
 let columnWidthsByTab = {}; // 탭별로 컬럼 너비 관리
+let sortStatesByTab = {}; // 탭별로 정렬 상태 관리
 let nextTabId = 5;
 
 // 실행 취소를 위한 히스토리
@@ -72,6 +73,15 @@ function loadData() {
     if (savedNextTabId) {
         nextTabId = parseInt(savedNextTabId);
     }
+    
+    // 정렬 상태 로드
+    const savedSortStates = localStorage.getItem('todoAppSortStatesByTab');
+    if (savedSortStates) {
+        sortStatesByTab = JSON.parse(savedSortStates);
+    }
+    
+    // 정렬 상태 초기화
+    initializeSortStates();
 }
 
 // 히스토리에 현재 상태 저장
@@ -126,6 +136,7 @@ function saveData() {
     localStorage.setItem('todoAppTabNames', JSON.stringify(tabNames));
     localStorage.setItem('todoAppColumnNamesByTab', JSON.stringify(columnNamesByTab));
     localStorage.setItem('todoAppColumnWidthsByTab', JSON.stringify(columnWidthsByTab));
+    localStorage.setItem('todoAppSortStatesByTab', JSON.stringify(sortStatesByTab));
     localStorage.setItem('todoAppNextTabId', nextTabId.toString());
     
     // 온라인 모드일 때 Firebase에도 저장
@@ -451,11 +462,48 @@ function renderTabs() {
                 <table class="excel-table" id="excelTable${index}">
                     <thead>
                         <tr>
-                            <th style="width: ${getColumnWidth(index, 'rowNumber')}" class="center-header"><input type="text" class="header-input center-input" value="${getColumnName(index, 'rowNumber')}" onchange="updateColumnName(${index}, 'rowNumber', this.value)"><div class="column-resizer" data-tab="${index}" data-column="rowNumber"></div></th>
-                            <th style="width: ${getColumnWidth(index, 'title')}" class="center-header"><input type="text" class="header-input center-input" value="${getColumnName(index, 'title')}" onchange="updateColumnName(${index}, 'title', this.value)"><div class="column-resizer" data-tab="${index}" data-column="title"></div></th>
-                            <th style="width: ${getColumnWidth(index, 'memo1')}" class="center-header"><input type="text" class="header-input center-input" value="${getColumnName(index, 'memo1')}" onchange="updateColumnName(${index}, 'memo1', this.value)"><div class="column-resizer" data-tab="${index}" data-column="memo1"></div></th>
-                            <th style="width: ${getColumnWidth(index, 'memo2')}" class="center-header"><input type="text" class="header-input center-input" value="${getColumnName(index, 'memo2')}" onchange="updateColumnName(${index}, 'memo2', this.value)"><div class="column-resizer" data-tab="${index}" data-column="memo2"></div></th>
-                            <th style="width: ${getColumnWidth(index, 'memo3')}" class="center-header"><input type="text" class="header-input center-input" value="${getColumnName(index, 'memo3')}" onchange="updateColumnName(${index}, 'memo3', this.value)"><div class="column-resizer" data-tab="${index}" data-column="memo3"></div></th>
+                            <th style="width: ${getColumnWidth(index, 'rowNumber')}" class="center-header">
+                                <div class="header-container">
+                                    <input type="text" class="header-input center-input" value="${getColumnName(index, 'rowNumber')}" onchange="updateColumnName(${index}, 'rowNumber', this.value)">
+                                </div>
+                                <div class="column-resizer" data-tab="${index}" data-column="rowNumber"></div>
+                            </th>
+                            <th style="width: ${getColumnWidth(index, 'title')}" class="center-header">
+                                <div class="header-container">
+                                    <input type="text" class="header-input center-input" value="${getColumnName(index, 'title')}" onchange="updateColumnName(${index}, 'title', this.value)">
+                                    <div class="sort-buttons">
+                                        <button class="sort-btn" data-sort-column="title" onclick="sortTable(${index}, 'title')" title="정렬"></button>
+                                    </div>
+                                </div>
+                                <div class="column-resizer" data-tab="${index}" data-column="title"></div>
+                            </th>
+                            <th style="width: ${getColumnWidth(index, 'memo1')}" class="center-header">
+                                <div class="header-container">
+                                    <input type="text" class="header-input center-input" value="${getColumnName(index, 'memo1')}" onchange="updateColumnName(${index}, 'memo1', this.value)">
+                                    <div class="sort-buttons">
+                                        <button class="sort-btn" data-sort-column="memo1" onclick="sortTable(${index}, 'memo1')" title="정렬"></button>
+                                    </div>
+                                </div>
+                                <div class="column-resizer" data-tab="${index}" data-column="memo1"></div>
+                            </th>
+                            <th style="width: ${getColumnWidth(index, 'memo2')}" class="center-header">
+                                <div class="header-container">
+                                    <input type="text" class="header-input center-input" value="${getColumnName(index, 'memo2')}" onchange="updateColumnName(${index}, 'memo2', this.value)">
+                                    <div class="sort-buttons">
+                                        <button class="sort-btn" data-sort-column="memo2" onclick="sortTable(${index}, 'memo2')" title="정렬"></button>
+                                    </div>
+                                </div>
+                                <div class="column-resizer" data-tab="${index}" data-column="memo2"></div>
+                            </th>
+                            <th style="width: ${getColumnWidth(index, 'memo3')}" class="center-header">
+                                <div class="header-container">
+                                    <input type="text" class="header-input center-input" value="${getColumnName(index, 'memo3')}" onchange="updateColumnName(${index}, 'memo3', this.value)">
+                                    <div class="sort-buttons">
+                                        <button class="sort-btn" data-sort-column="memo3" onclick="sortTable(${index}, 'memo3')" title="정렬"></button>
+                                    </div>
+                                </div>
+                                <div class="column-resizer" data-tab="${index}" data-column="memo3"></div>
+                            </th>
                             <th style="width: ${getColumnWidth(index, 'completed')}" class="center-header">완료</th>
                         </tr>
                     </thead>
@@ -477,6 +525,11 @@ function renderTabs() {
     
     // 탭 드래그 앤 드롭 설정
     setupTabDragAndDrop();
+    
+    // 정렬 버튼 상태 업데이트
+    tabNames.forEach((_, index) => {
+        updateSortButtons(index);
+    });
 }
 
 // 탭 전환
@@ -530,6 +583,12 @@ function addNewTab() {
         completed: '80px'
     };
     
+    // 새 탭의 정렬 상태 초기화
+    sortStatesByTab[newTabIndex] = {
+        column: null,
+        direction: null
+    };
+    
     nextTabId++;
     currentTab = newTabIndex;
     
@@ -569,6 +628,7 @@ function deleteTab(tabIndex) {
         
         // 컬럼 이름도 재정렬
         const newColumnNamesByTab = {};
+        const newSortStatesByTab = {};
         let sourceIndex = 0;
         for (let i = 0; i < tabNames.length; i++) {
             if (sourceIndex === tabIndex) sourceIndex++; // 삭제된 탭 건너뛰기
@@ -577,9 +637,14 @@ function deleteTab(tabIndex) {
                 memo2: '메모 2',
                 memo3: '메모 3'
             };
+            newSortStatesByTab[i] = sortStatesByTab[sourceIndex] || {
+                column: null,
+                direction: null
+            };
             sourceIndex++;
         }
         columnNamesByTab = newColumnNamesByTab;
+        sortStatesByTab = newSortStatesByTab;
         
         // 현재 탭 조정
         if (currentTab >= tabNames.length) {
@@ -1572,5 +1637,99 @@ async function forceLocalToFirebaseMigration() {
     
     alert('✅ 기존 할일 데이터가 구글 계정으로 이전되었습니다!');
     console.log('✅ 마이그레이션 완료!');
+}
+
+// 정렬 상태 초기화
+function initializeSortStates() {
+    for (let i = 0; i < tabNames.length; i++) {
+        if (!sortStatesByTab[i]) {
+            sortStatesByTab[i] = {
+                column: null,
+                direction: null
+            };
+        }
+    }
+}
+
+// 정렬 함수
+function sortTable(tabIndex, column) {
+    if (!taskData[tabIndex] || taskData[tabIndex].length === 0) return;
+    
+    // 현재 정렬 상태 확인
+    const currentSort = sortStatesByTab[tabIndex];
+    let direction = 'asc';
+    
+    // 같은 컬럼을 다시 클릭하면 방향 토글
+    if (currentSort.column === column) {
+        if (currentSort.direction === 'asc') {
+            direction = 'desc';
+        } else if (currentSort.direction === 'desc') {
+            // 내림차순에서 다시 클릭하면 정렬 해제
+            direction = null;
+        }
+    }
+    
+    // 히스토리 저장
+    saveToHistory();
+    
+    if (direction === null) {
+        // 정렬 해제 - 원래 순서로 복원 (ID 순서)
+        taskData[tabIndex].sort((a, b) => a.id - b.id);
+        sortStatesByTab[tabIndex] = { column: null, direction: null };
+    } else {
+        // 정렬 실행
+        taskData[tabIndex].sort((a, b) => {
+            let valueA = a[column] || '';
+            let valueB = b[column] || '';
+            
+            // 문자열로 변환
+            valueA = String(valueA).toLowerCase();
+            valueB = String(valueB).toLowerCase();
+            
+            // 숫자인지 확인
+            const isNumA = !isNaN(valueA) && !isNaN(parseFloat(valueA));
+            const isNumB = !isNaN(valueB) && !isNaN(parseFloat(valueB));
+            
+            if (isNumA && isNumB) {
+                // 둘 다 숫자면 숫자로 비교
+                valueA = parseFloat(valueA);
+                valueB = parseFloat(valueB);
+            }
+            
+            let result = 0;
+            if (valueA < valueB) result = -1;
+            else if (valueA > valueB) result = 1;
+            
+            return direction === 'desc' ? -result : result;
+        });
+        
+        sortStatesByTab[tabIndex] = { column, direction };
+    }
+    
+    // 테이블 다시 렌더링
+    renderTable(tabIndex);
+    updateSortButtons(tabIndex);
+    saveData();
+}
+
+// 정렬 버튼 상태 업데이트
+function updateSortButtons(tabIndex) {
+    const currentSort = sortStatesByTab[tabIndex];
+    const table = document.getElementById(`excelTable${tabIndex}`);
+    if (!table) return;
+    
+    // 모든 정렬 버튼 초기화
+    const sortButtons = table.querySelectorAll('.sort-btn');
+    sortButtons.forEach(btn => {
+        btn.classList.remove('active', 'asc', 'desc');
+    });
+    
+    // 현재 정렬된 컬럼의 버튼 활성화
+    if (currentSort.column && currentSort.direction) {
+        const activeButton = table.querySelector(`[data-sort-column="${currentSort.column}"]`);
+        if (activeButton) {
+            activeButton.classList.add('active', currentSort.direction);
+        }
+    }
 }
 
