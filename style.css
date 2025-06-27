@@ -681,34 +681,49 @@ body.col-resizing * {
     display: flex;
     flex-direction: column;
     gap: 1px;
+    min-width: 20px;
 }
 
 .sort-btn {
-    background: transparent;
-    border: none;
+    background: rgba(102, 126, 234, 0.1);
+    border: 1px solid rgba(102, 126, 234, 0.2);
     cursor: pointer;
-    font-size: 10px;
-    line-height: 1;
-    padding: 1px 3px;
-    color: #666;
+    font-size: 12px;
+    line-height: 1.2;
+    padding: 3px 5px;
+    color: #667eea;
     transition: all 0.2s ease;
-    border-radius: 2px;
+    border-radius: 3px;
+    min-height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .sort-btn:hover {
-    background: rgba(102, 126, 234, 0.1);
-    color: #667eea;
+    background: rgba(102, 126, 234, 0.2);
+    color: #5a67d8;
+    transform: scale(1.05);
 }
 
 .sort-btn.active {
-    color: #667eea;
+    background: #667eea;
+    color: white;
     font-weight: bold;
+    border-color: #667eea;
 }
 
-.sort-btn.asc:after {
+.sort-btn:before {
+    content: "⇅";
+    font-size: 10px;
+}
+
+.sort-btn.asc:before {
     content: "▲";
+    font-size: 8px;
 }
 
-.sort-btn.desc:after {
+.sort-btn.desc:before {
     content: "▼";
+    font-size: 8px;
 } 
