@@ -161,6 +161,22 @@ document.addEventListener('DOMContentLoaded', function() {
             setTimeout(setupFirebaseAuth, 1000);
         }
     }, 100); // 더 빠른 초기화
+    
+    // 백업 버튼
+    const backupBtn = document.createElement('button');
+    backupBtn.textContent = '🔄 완전 백업';
+    backupBtn.style.cssText = 'position: fixed; top: 10px; right: 10px; z-index: 9999; background: #ff6b6b; color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; font-size: 12px;';
+    backupBtn.onclick = createCompleteBackup;
+    backupBtn.title = '모든 데이터를 JSON 파일로 백업';
+    document.body.appendChild(backupBtn);
+    
+    // 복원 버튼  
+    const restoreBtn = document.createElement('button');
+    restoreBtn.textContent = '📥 데이터 복원';
+    restoreBtn.style.cssText = 'position: fixed; top: 50px; right: 10px; z-index: 9999; background: #4ecdc4; color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; font-size: 12px;';
+    restoreBtn.onclick = restoreCompleteBackup;
+    restoreBtn.title = '백업 파일에서 데이터 복원';
+    document.body.appendChild(restoreBtn);
 });
 
 function setupFirebaseAuth() {
@@ -1585,11 +1601,12 @@ function createCompleteBackup() {
         tabNames: tabNames || [],
         columnNamesByTab: columnNamesByTab || {},
         columnWidthsByTab: columnWidthsByTab || {},
+        sortStatesByTab: sortStatesByTab || {},
         currentTab: currentTab || 0,
         nextTabId: nextTabId || 1,
         history: undoHistory || [],
         backupDate: new Date().toISOString(),
-        version: "pre-firebase-backup"
+        version: "complete-backup-v2"
     };
     
     const blob = new Blob([JSON.stringify(allData, null, 2)], { type: 'application/json' });
@@ -1606,15 +1623,74 @@ function createCompleteBackup() {
     alert('백업 파일이 다운로드되었습니다!');
 }
 
-// 페이지 로드 시 백업 버튼 추가
-document.addEventListener('DOMContentLoaded', function() {
-    const container = document.querySelector('.container');
-    const backupBtn = document.createElement('button');
-    backupBtn.textContent = '🔄 완전 백업';
-    backupBtn.style.cssText = 'position: fixed; top: 10px; right: 10px; z-index: 9999; background: #ff6b6b; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer;';
-    backupBtn.onclick = createCompleteBackup;
-    document.body.appendChild(backupBtn);
-});
+// 완전 복원 함수
+function restoreCompleteBackup() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    
+    input.onchange = function(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const backupData = JSON.parse(e.target.result);
+                
+                // 백업 파일 유효성 검사
+                if (!backupData.taskData || !backupData.tabNames) {
+                    alert('❌ 올바르지 않은 백업 파일입니다.');
+                    return;
+                }
+                
+                // 복원 확인
+                const backupDate = backupData.backupDate ? new Date(backupData.backupDate).toLocaleString('ko-KR') : '알 수 없음';
+                const confirmMessage = `백업 파일을 복원하시겠습니까?\n\n` +
+                    `📅 백업 날짜: ${backupDate}\n` +
+                    `📁 탭 개수: ${backupData.tabNames.length}개\n` +
+                    `📝 버전: ${backupData.version || '구버전'}\n\n` +
+                    `⚠️ 현재 데이터가 모두 교체됩니다!`;
+                
+                if (!confirm(confirmMessage)) return;
+                
+                // 현재 상태를 히스토리에 저장 (복원 전 백업)
+                saveToHistory();
+                
+                // 데이터 복원
+                taskData = backupData.taskData || {};
+                tabNames = backupData.tabNames || ['기본 탭'];
+                columnNamesByTab = backupData.columnNamesByTab || {};
+                columnWidthsByTab = backupData.columnWidthsByTab || {};
+                sortStatesByTab = backupData.sortStatesByTab || {};
+                currentTab = Math.min(backupData.currentTab || 0, tabNames.length - 1);
+                nextTabId = backupData.nextTabId || tabNames.length;
+                
+                // 정렬 상태 초기화 (누락된 탭들을 위해)
+                initializeSortStates();
+                
+                // UI 새로고침
+                renderTabs();
+                renderAllTables();
+                switchTab(currentTab);
+                
+                // 데이터 저장
+                saveData();
+                
+                console.log('✅ 완전 복원 완료!');
+                alert(`✅ 백업 데이터가 성공적으로 복원되었습니다!\n\n📅 백업 날짜: ${backupDate}`);
+                
+            } catch (error) {
+                console.error('❌ 복원 실패:', error);
+                alert('❌ 백업 파일을 읽는 중 오류가 발생했습니다.\n올바른 백업 파일인지 확인해주세요.');
+            }
+        };
+        
+        reader.readAsText(file);
+    };
+    
+    input.click();
+}
 
 // 수동 마이그레이션 함수 추가
 async function forceLocalToFirebaseMigration() {
